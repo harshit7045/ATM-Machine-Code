@@ -1,0 +1,281 @@
+#include <stdio.h>
+#include <string.h>
+// function prototyping
+int find_user1();
+int find_user();
+void robo_var();
+void verify_pin();
+void change_pin();
+void widthdraw();
+int bal_enq();
+void transfer();
+void ab();
+
+// characteristics of user
+struct user
+{
+   int pin;
+   int acc_num;
+   int sav_bal;
+   int cur_bal;
+   char name;
+};
+// robot verification process
+void robo_var()
+{
+   int a;
+   printf("Enter a number between 10 to 99 for verification!!  \n");
+   scanf("%d", &a);
+   if (!(a >= 10 && a <= 99))
+   {
+      printf("Verification failed! Try again!!\n");
+      robo_var();
+   }
+}
+int find_user1()
+{
+   fflush(stdin);
+   int acc_num;
+   printf("Enter account number of receiver\n");
+   scanf("%d", &acc_num);
+   if (acc_num <= 103 && acc_num >= 101)
+   {
+
+      return acc_num - 100 - 1;
+   }
+   else
+   {
+      printf("Your entered account doesn't exist ! Try Again!!\n");
+      find_user();
+   }
+}
+// code to identify the user
+int find_user()
+{
+   fflush(stdin);
+   int acc_num;
+   printf("Please enter your account number : \n");
+   scanf("%d", &acc_num);
+   if (acc_num <= 104 && acc_num >= 101)
+   {
+
+      return acc_num - 100 - 1;
+   }
+   else
+   {
+      printf("Your entered account doesn't exist ! Try Again!!\n");
+      find_user();
+   }
+}
+// pin verification process
+void verify_pin(struct user *u1)
+{
+   fflush(stdin);
+   printf("Please enter your pin :\n");
+   int pin;
+   scanf("%d", &pin);
+   if (!(pin == (*u1).pin))
+   {
+      printf("Incorrect Pin! Try again!!\n");
+      verify_pin(u1);
+   }
+}
+// pin change functionality
+void change_pin(struct user *u1)
+{
+   int new_pin;
+   printf("Enter new pin : \n");
+   scanf("%d", &new_pin);
+   int new_pin1;
+   printf("Enter new pin again : \n");
+   scanf("%d", &new_pin1);
+   if (new_pin != new_pin1)
+   {
+      printf("Mismatched! Enter again!! \n");
+      change_pin(&u1);
+   }
+   (*u1).pin = new_pin;
+}
+// money withdrawl functionality
+void widthdraw(struct user *u1)
+{
+   printf("Select\n 1 For Current Account. \n 2 For Savings Account. \n");
+   int var;
+   scanf("%d", &var);
+   if (!(0 < var && var <= 2))
+   {
+      widthdraw(u1);
+   }
+   int amt;
+   printf("Enter the amount :\n");
+   scanf("%d", &amt);
+   if (amt % 100 != 0)
+   {
+      printf("Entered amount is not a mulitple of 100!!\n");
+      widthdraw(u1);
+   }
+   if (var == 1)
+   {
+      if (amt > (*u1).cur_bal)
+      {
+         printf("Entered amount exceeds current balance !\n Try Again!! \n");
+         widthdraw(u1);
+      }
+      else
+      {
+         (*u1).cur_bal -= amt;
+         printf("Remaining balance is :%d\n", (*u1).cur_bal);
+      }
+   }
+   if (var == 2)
+   {
+      if (amt > (*u1).sav_bal)
+      {
+         printf("Entered amount exceeds current balance ! Try Again!!\n");
+         widthdraw(u1);
+      }
+      else
+      {
+         (*u1).sav_bal -= amt;
+         printf("Your transaction has been completed!!");
+         printf("Remaining balance is :%d\n", (*u1).sav_bal);
+      }
+   }
+}
+// balance enquiry functionality
+int bal_enq(struct user u1)
+{
+   // printf("Name : %s\n",(*u1).name);
+   printf("Account number :%d\n", (u1).acc_num);
+   printf("Current balance :%d\n", (u1).cur_bal);
+   printf("Savings balance  :%d\n", (u1).sav_bal);
+}
+// money transfering functionality
+void transfer(struct user *u1, struct user *arr)
+{
+   int money;
+   int index = find_user1();
+   struct user *u2 = &(arr[index]);
+   if (u1 == u2)
+   {
+      printf("You entered your own account number \n");
+      transfer(u1, arr);
+   }
+
+   printf("Enter amount you want to transfer: \n");
+   scanf("%d", &money);
+   if (money > (*u1).cur_bal)
+   {
+      printf("Entered amount exceeds the current balance! Try Again!! \n");
+      transfer(u1, arr);
+   }
+   else
+   {
+      (*u1).cur_bal -= money;
+      (*u2).cur_bal += money;
+   }
+
+   // bal_enq(&u1);
+   // bal_enq(&u2);
+   printf("Your current balance is :- %d\n", (*u1).cur_bal);
+}
+
+// defining 4 basic  features of ATM
+void ab(struct user *u1, struct user *arr)
+{
+   verify_pin(u1);
+   int i;
+   printf("Press\n 1 for Money Transfer \n 2 For Balance Enquiry \n 3 For Money Withdrawl \n 4 For Pin Change\n");
+   scanf("%d", &i);
+   switch (i)
+   {
+   case 1:
+      transfer(u1, arr);
+      break;
+   case 2:
+      bal_enq(*u1);
+      break;
+   case 3:
+      widthdraw(u1);
+      break;
+   case 4:
+      change_pin(u1);
+      break;
+   default:
+      printf("Wrong Input!Try Again!!\n");
+      break;
+   }
+}
+void admin(struct user *u1)
+{
+   printf("Number of users currently using:\n");
+   printf("%d\n", 3);
+   for (int i = 0; i < 3; i++)
+   {
+
+      printf("Account Number: %d\n", 101 + i);
+      printf("Current Balance: %d\n", (*u1).cur_bal);
+      printf("Savings Balance: %d\n", (*u1).sav_bal);
+      u1 = u1 + 1;
+   }
+}
+// main function
+int main()
+// user details
+{
+   struct user user1, user2, user3, user4;
+   struct user user_arr[4] = {user1, user2, user3, user4};
+   user_arr[0].acc_num = 101;
+   user_arr[0].pin = 1234;
+   user_arr[1].acc_num = 102;
+   user_arr[1].pin = 1235;
+   user_arr[1].cur_bal = 10000;
+   user_arr[0].cur_bal = 10000;
+
+   user_arr[1].sav_bal = 10000;
+   user_arr[0].sav_bal = 10000;
+   user_arr[2].acc_num = 103;
+   user_arr[2].pin = 1236;
+   user_arr[2].cur_bal = 10000;
+
+   user_arr[2].sav_bal = 10000;
+   user_arr[3].acc_num = 104;
+   user_arr[3].pin = 1111;
+   // function calling
+   // admin(user_arr);
+   printf("Greetings!! Welcome to Andha Paisa Bank!!\n \n");
+   robo_var();
+   int a = find_user(user_arr);
+   struct user u1 = user_arr[a];
+
+   // verify_pin(&u1);
+   struct user *u100 = &user_arr[a];
+   if (a == 3)
+   {
+      verify_pin(u100);
+      admin(user_arr);
+   }
+   else
+   {
+      ab(&u1, user_arr);
+      // process to again acess the code
+      for (int i = 1;;)
+      {
+         int a;
+         fflush(stdin);
+         printf("Enter\n1 to continue\n2 to exit\n");
+         scanf("%d", &a);
+         if (a == 1)
+         {
+
+            ab(&u1, user_arr);
+         }
+         else
+         {
+            printf("Thanks for banking with us!!");
+            break;
+         }
+      }
+   }
+   return 0;
+}
